@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CropIt Demo</title>
+    <!-- CSS only -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="croppie.css" />
+  </head>
+  <body>
+    <div id="uploadimageModal" class="modal" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Crop Image</h4>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-8 text-center">
+                <div
+                  id="image_demo"
+                  style="width: 350px; margin-top: 30px"
+                ></div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-success crop_image">Crop Image</button>
+            <button type="button" class="btn btn-default close" data-dismiss="modal">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="uploadimageModal_cr" class="modal" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Crop Image</h4>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-8 text-center">
+                <div
+                  id="image_demo_cr"
+                  style="width: 350px; margin-top: 30px"
+                ></div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-success crop_image_cr">Crop Image</button>
+            <button
+              type="button"
+              class="btn btn-default close"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="row rounded border border-primary pb-3">
+        <h2 class="text-center p-3">Croppie</h2>
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header bg-white">
+              <h2>square</h2>
+            </div>
+            <div class="card-body">
+              <div class="file btn btn-lg btn-primary" style="position: relative; overflow: hidden;">
+                Upload
+                <input
+                  type="file"
+                  name="upload_image"
+                  id="upload_image"
+                  accept="image/x-png,image/gif,image/jpeg"
+                  style="position: absolute; font-size: 50px; opacity: 0; right: 0; top: 0;"
+                />
+              </div>
+            </div>
+            <div class="card-footer">
+              <img
+                id="uploaded_image"
+                src=""
+                style="height: 200px; width: 200px; display: none"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header bg-white">
+              <h2>circle</h2>
+            </div>
+            <div class="card-body">
+                <div class="file btn btn-lg btn-primary" style="position: relative; overflow: hidden;">
+                    Upload
+              <input
+                type="file"
+                name="upload_image_cr"
+                id="upload_image_cr"
+                accept="image/x-png,image/gif,image/jpeg"
+                style="position: absolute; font-size: 50px; opacity: 0; right: 0; top: 0;"
+              />
+                </div>
+            </div>
+            <div class="card-footer">
+              <img
+                id="uploaded_image_cr"
+                src=""
+                style="height: 200px; width: 200px; display: none"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- JavaScript Bundle with Popper -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"
+    ></script>
+    <script src="croppie.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $(".close").on("click", function () {
+          $("#uploadimageModal").modal("hide");
+          $("#uploadimageModal_cr").modal("hide");
+        });
+        $("#upload_image").on("change", function () {
+          if (typeof $image_crop === "object") {
+            $image_crop.croppie("destroy");
+          }
+          var reader = new FileReader();
+          reader.onload = function (event) {
+            $image_crop = $("#image_demo").croppie({
+              enableExif: true,
+              viewport: {
+                width: 200,
+                height: 200,
+                type: "square", //circle
+              },
+              boundary: {
+                width: 300,
+                height: 300,
+              },
+            });
+
+            $image_crop.croppie("bind", {
+              url: event.target.result,
+            });
+          };
+          reader.readAsDataURL(this.files[0]);
+          $("#uploadimageModal").modal("show");
+          $(".crop_image").click(function (event) {
+            $image_crop
+              .croppie("result", {
+                type: "canvas",
+                size: "viewport",
+              })
+              .then(function (response) {
+                $("#uploadimageModal").modal("hide");
+                $("#uploaded_image").prop("src", response);
+                $("#uploaded_image").css("display", "block");
+              });
+            //   }
+          });
+        });
+
+        $("#upload_image_cr").on("change", function () {
+          if (typeof $image_crop === "object") {
+            $image_crop.croppie("destroy");
+          }
+          $image_crop = $("#image_demo_cr").croppie({
+            enableExif: true,
+            viewport: {
+              width: 200,
+              height: 200,
+              type: "circle",
+            },
+            boundary: {
+              width: 300,
+              height: 300,
+            },
+          });
+          var reader = new FileReader();
+          reader.onload = function (event) {
+            $image_crop.croppie("bind", {
+              url: event.target.result,
+            });
+          };
+
+          reader.readAsDataURL(this.files[0]);
+          $("#uploadimageModal_cr").modal("show");
+          $(".crop_image_cr").click(function (event) {
+            $image_crop
+              .croppie("result", {
+                type: "canvas",
+                size: "viewport",
+              })
+              .then(function (response) {
+                $("#uploadimageModal_cr").modal("hide");
+                $("#uploaded_image_cr").prop("src", response);
+                $("#uploaded_image_cr").css("display", "block");
+              });
+            //   }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
